@@ -1,4 +1,4 @@
-package com.ticketing.common.api;
+package com.ticketing.common.controller;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
