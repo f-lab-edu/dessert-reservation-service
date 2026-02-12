@@ -6,8 +6,8 @@ services:
       - ${PUBLISHED_APP}:8080
     depends_on:
       - mysql
-      - redis_cache
-      - redis_queue
+      - redis
+
     build:
       context: ./
       dockerfile: ./Dockerfile
@@ -23,15 +23,10 @@ services:
       - SPRING_JPA_SHOW_SQL=true
       - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.MySQLDialect
 
-      # Redis Cache Configuration (기본 Redis 설정)
-      - SPRING_DATA_REDIS_HOST=redis_cache
+      # Redis Configuration
+      - SPRING_DATA_REDIS_HOST=redis
       - SPRING_DATA_REDIS_PORT=6379
-      - SPRING_DATA_REDIS_PASSWORD=${REDIS_CACHE_PASSWORD}
-
-      # Redis Queue Configuration (커스텀 사용 시)
-      - REDIS_QUEUE_HOST=redis_queue
-      - REDIS_QUEUE_PORT=6379
-      - REDIS_QUEUE_PASSWORD=${REDIS_QUEUE_PASSWORD}
+      - SPRING_DATA_REDIS_PASSWORD=${REDIS_PASSWORD}
     container_name: "backend"
 
   mysql:
@@ -51,25 +46,15 @@ services:
       - --collation-server=utf8mb4_unicode_ci
     container_name: "mysql"
 
-  redis_cache:
+  redis:
     image: redis:8.0
     volumes:
-      - ${REDIS_CACHE_DATA_PATH}:/data/redis
+      - ${REDIS_DATA_PATH}:/data/redis
     ports:
-      - "${REDIS_CACHE_PORT}:6379"
+      - "${REDIS_PORT}:6379"
     restart: always
-    container_name: "redis_cache"
-    command: redis-server --port ${REDIS_CACHE_PORT} --requirepass ${REDIS_CACHE_PASSWORD}
-
-  redis_queue:
-    image: redis:8.0
-    volumes:
-      - ${REDIS_QUEUE_DATA_PATH}:/data/redis
-    ports:
-      - "${REDIS_QUEUE_PORT}:6379"
-    restart: always
-    container_name: "redis_queue"
-    command: redis-server --port ${REDIS_QUEUE_PORT} --requirepass ${REDIS_QUEUE_PASSWORD}
+    container_name: "redis"
+    command: redis-server --port ${REDIS_PORT} --requirepass ${REDIS_PASSWORD}
 
 volumes:
   shared-data:
