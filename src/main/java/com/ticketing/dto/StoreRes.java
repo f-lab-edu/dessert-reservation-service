@@ -1,5 +1,6 @@
 package com.ticketing.dto;
 
+import com.querydsl.core.annotations.QueryProjection;
 import com.ticketing.entity.Store;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,6 +13,15 @@ public class StoreRes {
     private Double latitude;
     private Double longitude;
     private Integer totalInventory;
+
+    @QueryProjection
+    public StoreRes(Long storeId, String name, Double latitude, Double longitude, Integer totalInventory) {
+        this.storeId = storeId;
+        this.name = name;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.totalInventory = totalInventory;
+    }
 
     public static StoreRes from(Store store, Integer totalInventory) {
         return StoreRes.builder()
