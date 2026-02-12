@@ -1,6 +1,7 @@
 package com.ticketing.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 @RequiredArgsConstructor
+@AllArgsConstructor
 public class Reservation {
     @Id
     @Column(name = "reservation_id")

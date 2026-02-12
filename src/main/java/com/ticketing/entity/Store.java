@@ -3,19 +3,18 @@ package com.ticketing.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 @Entity(name = "stores")
 @Getter
 @Builder
 @RequiredArgsConstructor
+@AllArgsConstructor
 public class Store {
     @Id
     @Column(name = "store_id")
     private Long id;
     private String name;
-    private Float latitude;
-    private Float longitude;
+    private Double latitude;
+    private Double longitude;
 }

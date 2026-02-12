@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 @RequiredArgsConstructor
+@AllArgsConstructor
 public class User {
     @Id
     @Column(name = "user_id")
