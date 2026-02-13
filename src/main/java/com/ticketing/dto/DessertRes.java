@@ -1,6 +1,7 @@
 package com.ticketing.dto;
 
 import com.ticketing.entity.Dessert;
+import com.ticketing.enums.OpenStatus;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -15,7 +16,7 @@ public class DessertRes {
     private Integer inventory;
     private Integer purchaseLimit;
     private LocalDateTime openDt;
-    private String openStatus;
+    private OpenStatus openStatus;
 
     public static DessertRes from(Dessert dessert) {
         return DessertRes.builder()
