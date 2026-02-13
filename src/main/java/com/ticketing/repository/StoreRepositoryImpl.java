@@ -38,7 +38,7 @@ public class StoreRepositoryImpl implements CustomStoreRepository {
                         store.latitude.between(minLatitude, maxLatitude),
                         store.longitude.between(minLongitude, maxLongitude)
                 )
-                .groupBy(store.id)
+                .groupBy(store.id, store.name, store.latitude, store.longitude)
                 .fetch();
     }
 }
