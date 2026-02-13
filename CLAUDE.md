@@ -133,3 +133,24 @@ DTO Projection은 `@QueryProjection` 생성자를 사용한다 (`QStoreRes` 자�
 
 ### 의존성 주입
 - `@RequiredArgsConstructor` + `final` 필드로 생성자 주입
+
+### 주석
+모든 메서드에 호출 맥락 또는 동작 방식을 간단히 주석으로 작성한다.
+
+```java
+// 좋은 예시
+/**
+ * 지도 화면에서 사용자의 화면 범위(위도/경도) 내에 있는 스토어 목록 조회.
+ * 각 스토어의 위치 정보와 잔여 디저트 수량을 함께 반환.
+ */
+public List<StoreRes> getStoreList(...) { ... }
+
+/**
+ * Store와 Dessert를 LEFT JOIN하여 단일 쿼리로 스토어별 재고 합산.
+ * N+1 문제를 방지하기 위해 QueryDSL DTO Projection으로 직접 반환.
+ */
+public List<StoreRes> findAllByLatitudeBetweenAndLongitudeBetween(...) { ... }
+```
+
+- 말투: `~.` 으로 끝나는 간결한 서술형 (예: "스토어 목록 조회.")
+- `~합니다` 형태의 경어체 사용 금지
