@@ -1,11 +1,13 @@
 package com.ticketing.controller;
 
 import com.ticketing.common.controller.BaseController;
+import com.ticketing.dto.DessertRes;
 import com.ticketing.dto.StoreRes;
 import com.ticketing.service.StoreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,5 +31,14 @@ public class StoreController extends BaseController {
             @RequestParam double maxLongitude
     ) {
         return ResponseEntity.ok(storeService.getStoreList(minLatitude, maxLatitude, minLongitude, maxLongitude));
+    }
+
+    /**
+     * storeId로 스토어에 등록된 디저트 목록 조회.
+     * 존재하지 않는 storeId인 경우 EntityNotFoundException 404에러 발생
+     */
+    @GetMapping("/stores/{storeId}")
+    public ResponseEntity<List<DessertRes>> getStoreDesserts(@PathVariable Long storeId) {
+        return ResponseEntity.ok(storeService.getStoreDesserts(storeId));
     }
 }
