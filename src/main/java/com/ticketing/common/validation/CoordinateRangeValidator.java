@@ -8,23 +8,20 @@ public class CoordinateRangeValidator implements ConstraintValidator<ValidCoordi
 
     @Override
     public boolean isValid(CoordinateRequest req, ConstraintValidatorContext context) {
-        if (req == null) return true;
-
-        boolean valid = true;
         context.disableDefaultConstraintViolation();
 
         if (req.minLatitude() > req.maxLatitude()) {
             context.buildConstraintViolationWithTemplate("minLatitude가 maxLatitude보다 클 수 없습니다.")
                     .addPropertyNode("minLatitude")
                     .addConstraintViolation();
-            valid = false;
+            return false;
         }
         if (req.minLongitude() > req.maxLongitude()) {
             context.buildConstraintViolationWithTemplate("minLongitude가 maxLongitude보다 클 수 없습니다.")
                     .addPropertyNode("minLongitude")
                     .addConstraintViolation();
-            valid = false;
+            return false;
         }
-        return valid;
+        return true;
     }
 }
