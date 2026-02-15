@@ -1,10 +1,11 @@
-package com.ticketing.repository;
+package com.ticketing.repository.impl;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ticketing.dto.QStoreRes;
 import com.ticketing.dto.StoreRes;
 import com.ticketing.entity.QDessert;
 import com.ticketing.entity.QStore;
+import com.ticketing.repository.CustomStoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
