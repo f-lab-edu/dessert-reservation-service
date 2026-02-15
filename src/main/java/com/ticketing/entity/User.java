@@ -2,6 +2,7 @@ package com.ticketing.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 public class User {
     @Id
     @Column(name = "user_id")
+    @GeneratedValue
     private Long id;
     private String name;
     private String email;

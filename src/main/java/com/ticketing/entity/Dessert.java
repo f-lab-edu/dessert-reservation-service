@@ -1,5 +1,6 @@
 package com.ticketing.entity;
 
+import com.ticketing.enums.OpenStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 public class Dessert {
     @Id
     @Column(name = "dessert_id")
+    @GeneratedValue
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
     private Store store;
@@ -26,6 +28,7 @@ public class Dessert {
     private Integer purchaseLimit;
     @Column(name = "open_dt")
     private LocalDateTime openDt;
+    @Enumerated(EnumType.STRING)
     @Column(name = "open_status")
-    private String openStatus;
+    private OpenStatus openStatus;
 }

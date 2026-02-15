@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 public class Reservation {
     @Id
     @Column(name = "reservation_id")
+    @GeneratedValue
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
