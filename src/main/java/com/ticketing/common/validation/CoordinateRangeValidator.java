@@ -1,13 +1,13 @@
 package com.ticketing.common.validation;
 
-import com.ticketing.dto.CoordinateRequest;
+import com.ticketing.dto.StoreRequest;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-public class CoordinateRangeValidator implements ConstraintValidator<ValidCoordinateRange, CoordinateRequest> {
+public class CoordinateRangeValidator implements ConstraintValidator<ValidCoordinateRange, StoreRequest> {
 
     @Override
-    public boolean isValid(CoordinateRequest req, ConstraintValidatorContext context) {
+    public boolean isValid(StoreRequest req, ConstraintValidatorContext context) {
         context.disableDefaultConstraintViolation();
 
         if (req.minLatitude() > req.maxLatitude()) {

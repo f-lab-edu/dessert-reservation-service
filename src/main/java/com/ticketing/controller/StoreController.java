@@ -1,7 +1,7 @@
 package com.ticketing.controller;
 
 import com.ticketing.common.controller.BaseController;
-import com.ticketing.dto.CoordinateRequest;
+import com.ticketing.dto.StoreRequest;
 import com.ticketing.dto.DessertRes;
 import com.ticketing.dto.StoreRes;
 import com.ticketing.service.StoreService;
@@ -27,7 +27,7 @@ public class StoreController extends BaseController {
      * 위도(-90~90), 경도(-180~180) 범위 및 min/max 역전 여부를 검증하며, 유효하지 않으면 400 반환.
      */
     @GetMapping("/stores")
-    public ResponseEntity<List<StoreRes>> getStoreList(@Valid @ModelAttribute CoordinateRequest req) {
+    public ResponseEntity<List<StoreRes>> getStoreList(@Valid @ModelAttribute StoreRequest req) {
         return ResponseEntity.ok(storeService.getStoreList(
                 req.minLatitude(), req.maxLatitude(), req.minLongitude(), req.maxLongitude()
         ));
