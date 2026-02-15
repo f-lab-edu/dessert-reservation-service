@@ -35,7 +35,7 @@ public class StoreController extends BaseController {
 
     /**
      * storeId로 스토어에 등록된 디저트 목록 조회.
-     * 존재하지 않는 storeId인 경우 EntityNotFoundException 404에러 발생
+     * 존재하지 않는 storeId인 경우 빈 배열 반환.
      */
     @GetMapping("/stores/{storeId}")
     public ResponseEntity<List<DessertRes>> getStoreDesserts(@PathVariable Long storeId) {

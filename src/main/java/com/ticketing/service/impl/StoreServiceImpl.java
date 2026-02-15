@@ -29,8 +29,6 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     public List<DessertRes> getStoreDesserts(Long storeId) {
-        storeRepository.findById(storeId)
-                .orElseThrow(() -> new EntityNotFoundException("Store not found: " + storeId));
         return dessertRepository.findAllByStoreId(storeId).stream()
                 .map(DessertRes::from)
                 .toList();
