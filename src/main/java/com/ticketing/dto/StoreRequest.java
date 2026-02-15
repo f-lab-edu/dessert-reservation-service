@@ -1,10 +1,8 @@
 package com.ticketing.dto;
 
-import com.ticketing.common.validation.ValidCoordinateRange;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 
-@ValidCoordinateRange
 public record StoreRequest(
         @DecimalMin(value = "-90.0", message = "위도는 -90 이상이어야 합니다.")
         @DecimalMax(value = "90.0", message = "위도는 90 이하이어야 합니다.")
