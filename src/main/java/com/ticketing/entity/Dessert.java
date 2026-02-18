@@ -14,12 +14,13 @@ import java.time.LocalDateTime;
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
-public class Dessert {
+public class Dessert{
     @Id
     @Column(name = "dessert_id")
     @GeneratedValue
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "store_id")
     private Store store;
     private String name;
     private Float price;

@@ -1,11 +1,11 @@
 package com.ticketing.entity;
 
+import com.ticketing.common.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
-public class User {
+public class User extends BaseEntity {
     @Id
     @Column(name = "user_id")
     @GeneratedValue
@@ -24,9 +24,6 @@ public class User {
     private String password;
     @Column(name = "push_token")
     private String pushToken;
-    @Column(name = "created_dt")
-    @CreatedDate
-    private LocalDateTime createdDt;
     @Column(name = "deleted_dt")
     private LocalDateTime deletedDt;
 }
