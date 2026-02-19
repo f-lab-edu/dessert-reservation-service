@@ -35,4 +35,15 @@ public class Dessert{
     @Enumerated(EnumType.STRING)
     @Column(name = "open_status", nullable = false)
     private OpenStatus openStatus;
+
+
+    /**
+     * 예약 시 재고 차감. 재고 부족 시 IllegalArgumentException 발생.
+     */
+    public void decreaseInventory(int count) {
+        if (this.inventory < count) {
+            throw new IllegalArgumentException("재고가 부족합니다. 현재 재고: " + this.inventory + "개");
+        }
+        this.inventory -= count;
+    }
 }
