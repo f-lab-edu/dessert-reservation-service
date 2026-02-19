@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Entity(name = "reservations")
 @Getter
 @Builder
@@ -25,7 +27,8 @@ public class Reservation extends BaseEntity {
     @JoinColumn(name = "dessert_id")
     private Dessert dessert;
     private Integer count;
-    private Integer totalPrice;
+    @Column(name = "total_price", precision = 10, scale = 2)
+    private BigDecimal totalPrice;
     @Enumerated(EnumType.STRING)
     @Column(name = "reserve_status")
     private ReserveStatus reserveStatus;

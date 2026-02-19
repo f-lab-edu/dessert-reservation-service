@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity(name = "desserts")
@@ -23,13 +24,15 @@ public class Dessert{
     @JoinColumn(name = "store_id")
     private Store store;
     private String name;
-    private Float price;
+    @Column(precision = 10, scale = 2, nullable = false)
+    private BigDecimal price;
+    @Column(nullable = false)
     private Integer inventory;
-    @Column(name = "purchase_limit")
+    @Column(name = "purchase_limit", nullable = false)
     private Integer purchaseLimit;
-    @Column(name = "open_dt")
+    @Column(name = "open_dt", nullable = false)
     private LocalDateTime openDt;
     @Enumerated(EnumType.STRING)
-    @Column(name = "open_status")
+    @Column(name = "open_status", nullable = false)
     private OpenStatus openStatus;
 }
