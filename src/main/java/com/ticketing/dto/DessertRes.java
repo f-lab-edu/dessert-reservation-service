@@ -5,6 +5,7 @@ import com.ticketing.enums.OpenStatus;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 public class DessertRes {
     private Long dessertId;
     private String name;
-    private Float price;
+    private BigDecimal price;
     private Integer inventory;
     private Integer purchaseLimit;
     private LocalDateTime openDt;
