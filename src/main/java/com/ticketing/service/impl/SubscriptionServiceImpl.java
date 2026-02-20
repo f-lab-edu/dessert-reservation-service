@@ -1,6 +1,6 @@
 package com.ticketing.service.impl;
 
-import com.ticketing.dto.SubscriptionRes;
+import com.ticketing.dto.StoreRes;
 import com.ticketing.entity.Subscription;
 import com.ticketing.repository.StoreRepository;
 import com.ticketing.repository.SubscriptionRepository;
@@ -50,8 +50,24 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         }
     }
 
+    /**
+     * 사용자가 구독한 상점 리스트 조회.
+     * Subscription 에서 storeId를 추출하여 Store 엔티티를 조회 후 StoreRes로 변환.
+     */
     @Override
-    public List<SubscriptionRes> getSubscriptionList(Long userId) {
-        return null;
+    public List<StoreRes> getSubscriptionList(Long userId) {
+        List<Subscription> subscriptions = subscriptionRepository.findAllByUserId(userId);
+
+        List<Long> storeIds = subscriptions.stream()
+                .map(Subscription::getStoreId)
+                .toList();
+
+        if (storeIds.isEmpty()) {
+            return List.of();
+        }
+
+        return storeRepository.findAllById(storeIds).stream()
+                .map(store -> StoreRes.from(store, null))
+                .toList();
     }
 }
