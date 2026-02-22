@@ -1,6 +1,7 @@
 package com.ticketing.service;
 
 import com.ticketing.common.security.CustomUserDetails;
+import com.ticketing.common.validation.ReservationValidator;
 import com.ticketing.dto.ReservationReq;
 import com.ticketing.dto.ReservationRes;
 import com.ticketing.entity.Dessert;
@@ -8,6 +9,7 @@ import com.ticketing.entity.Reservation;
 import com.ticketing.entity.User;
 import com.ticketing.enums.OpenStatus;
 import com.ticketing.enums.ReserveStatus;
+import com.ticketing.exception.BusinessException;
 import com.ticketing.repository.DessertRepository;
 import com.ticketing.repository.ReservationRepository;
 import com.ticketing.repository.UserRepository;
@@ -22,7 +24,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -30,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ReservationServiceImplTest {
@@ -42,6 +43,8 @@ class ReservationServiceImplTest {
     private DessertRepository dessertRepository;
     @Mock
     private ReservationRepository reservationRepository;
+    @Mock
+    private ReservationValidator reservationValidator;
 
     private CustomUserDetails userDetails;
     private User user;
@@ -89,9 +92,9 @@ class ReservationServiceImplTest {
                 .build();
 
         when(dessertRepository.findByIdWithPessimisticLock(1L)).thenReturn(Optional.of(dessert));
-        when(reservationRepository.sumTodayCountByUserIdAndDessertId(
-                eq(1L), eq(1L), eq(ReserveStatus.CANCELLED), any(LocalDate.class)
-        )).thenReturn(0);
+        doNothing().when(reservationValidator).validateReservationAvailability(dessert);
+        doNothing().when(reservationValidator).validatePurchaseLimit(user, dessert, 1);
+        doNothing().when(reservationValidator).validateInventory(dessert, 1);
         when(reservationRepository.save(any(Reservation.class))).thenReturn(savedReservation);
 
         // when
@@ -116,12 +119,12 @@ class ReservationServiceImplTest {
         when(dessertRepository.findByIdWithPessimisticLock(999L)).thenReturn(Optional.empty());
 
         // when & then
-        ResponseStatusException exception = assertThrows(
-                ResponseStatusException.class,
+        BusinessException exception = assertThrows(
+                BusinessException.class,
                 () -> reservationService.reserve(userDetails, req)
         );
 
-        assertEquals("존재하지 않는 디저트입니다.", exception.getReason());
+        assertEquals("디저트를 찾을 수 없습니다.", exception.getMessage());
     }
 
     @Test
@@ -135,6 +138,8 @@ class ReservationServiceImplTest {
         ReservationReq req = new ReservationReq(1L, 1);
 
         when(dessertRepository.findByIdWithPessimisticLock(1L)).thenReturn(Optional.of(dessert));
+        doThrow(new ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST, "현재 예약할 수 없는 디저트입니다."))
+                .when(reservationValidator).validateReservationAvailability(dessert);
 
         // when & then
         ResponseStatusException exception = assertThrows(
@@ -153,9 +158,9 @@ class ReservationServiceImplTest {
         ReservationReq req = new ReservationReq(1L, 2);
 
         when(dessertRepository.findByIdWithPessimisticLock(1L)).thenReturn(Optional.of(dessert));
-        when(reservationRepository.sumTodayCountByUserIdAndDessertId(
-                eq(1L), eq(1L), eq(ReserveStatus.CANCELLED), any(LocalDate.class)
-        )).thenReturn(1);
+        doNothing().when(reservationValidator).validateReservationAvailability(dessert);
+        doThrow(new ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST, "구매 한도를 초과했습니다. 남은 구매 가능 수량: 1개"))
+                .when(reservationValidator).validatePurchaseLimit(user, dessert, 2);
 
         // when & then
         ResponseStatusException exception = assertThrows(
@@ -178,9 +183,10 @@ class ReservationServiceImplTest {
         ReservationReq req = new ReservationReq(1L, 2);
 
         when(dessertRepository.findByIdWithPessimisticLock(1L)).thenReturn(Optional.of(dessert));
-        when(reservationRepository.sumTodayCountByUserIdAndDessertId(
-                eq(1L), eq(1L), eq(ReserveStatus.CANCELLED), any(LocalDate.class)
-        )).thenReturn(0);
+        doNothing().when(reservationValidator).validateReservationAvailability(dessert);
+        doNothing().when(reservationValidator).validatePurchaseLimit(user, dessert, 2);
+        doThrow(new ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST, "재고가 부족합니다. 현재 재고: 1개"))
+                .when(reservationValidator).validateInventory(dessert, 2);
 
         // when & then
         ResponseStatusException exception = assertThrows(

@@ -1,5 +1,6 @@
 package com.ticketing.entity;
 
+import com.ticketing.exception.BusinessException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +19,7 @@ public class DessertTest {
     @DisplayName("count가 inventory보다 크면 에러")
     void throwsExceptionWhenCountExceedsInventory(){
         Dessert dessert = Dessert.builder().inventory(2).build();
-        assertThrows(IllegalArgumentException.class, () -> dessert.decreaseInventory(3));
+        assertThrows(BusinessException.class, () -> dessert.decreaseInventory(3));
         assertEquals(2, dessert.getInventory());
     }
 
