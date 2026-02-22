@@ -40,3 +40,6 @@ out/
 ### Environment
 .env
 application-local.properties
+
+### firebase
+src/main/resources/firebase/service-account.json
