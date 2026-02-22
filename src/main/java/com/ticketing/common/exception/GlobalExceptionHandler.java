@@ -1,5 +1,6 @@
 package com.ticketing.common.exception;
 
+import com.ticketing.exception.BusinessException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -23,12 +24,32 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     /**
+     * BusinessException 처리.
+     * 비즈니스 로직에서 발생하는 커스텀 예외 처리.
+     */
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException ex) {
+        log.warn("BusinessException: errorCode={}, message={}",
+                 ex.getErrorCode().name(), ex.getMessage(), ex);
+
+        ErrorResponse errorResponse = ErrorResponse.of(
+                ex.getStatus().value(),
+                ex.getStatus().name(),
+                ex.getMessage()
+        );
+
+        return ResponseEntity
+                .status(ex.getStatus())
+                .body(errorResponse);
+    }
+
+    /**
      * ResponseStatusException 처리.
      * 서비스 레이어에서 명시적으로 던진 비즈니스 로직 예외 처리.
      */
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<ErrorResponse> handleResponseStatusException(ResponseStatusException ex) {
-        log.warn("ResponseStatusException: {}", ex.getReason());
+        log.warn("ResponseStatusException: {}", ex.getReason(), ex);
 
         ErrorResponse errorResponse = ErrorResponse.of(
                 ex.getStatusCode().value(),
@@ -47,7 +68,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException ex) {
-        log.warn("EntityNotFoundException: {}", ex.getMessage());
+        log.warn("EntityNotFoundException: {}", ex.getMessage(), ex);
 
         ErrorResponse errorResponse = ErrorResponse.of(
                 HttpStatus.NOT_FOUND.value(),
@@ -66,7 +87,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
-        log.warn("IllegalArgumentException: {}", ex.getMessage());
+        log.warn("IllegalArgumentException: {}", ex.getMessage(), ex);
 
         ErrorResponse errorResponse = ErrorResponse.of(
                 HttpStatus.BAD_REQUEST.value(),
@@ -87,9 +108,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach(error -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
+            if (error instanceof FieldError fieldError) {
+                // 필드 레벨 에러
+                errors.put(fieldError.getField(), error.getDefaultMessage());
+            } else {
+                // 객체 레벨 에러 (예: @ScriptAssert)
+                errors.put(error.getObjectName(), error.getDefaultMessage());
+            }
         });
 
         log.warn("Validation failed: {}", errors);
@@ -114,9 +139,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleBindException(BindException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach(error -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
+            if (error instanceof FieldError fieldError) {
+                // 필드 레벨 에러
+                errors.put(fieldError.getField(), error.getDefaultMessage());
+            } else {
+                // 객체 레벨 에러
+                errors.put(error.getObjectName(), error.getDefaultMessage());
+            }
         });
 
         log.warn("Binding failed: {}", errors);
