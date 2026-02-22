@@ -3,12 +3,12 @@ package com.ticketing.controller;
 import com.ticketing.common.controller.BaseController;
 import com.ticketing.common.security.CustomUserDetails;
 import com.ticketing.dto.ReservationReq;
+import com.ticketing.dto.ReservationRes;
 import com.ticketing.service.ReservationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,14 +24,10 @@ public class ReservationController extends BaseController {
      * SecurityConfig에서 인증된 사용자만 접근 가능하도록 설정되어 있어 비로그인 접근 시 401 반환.
      */
     @PostMapping("/reservations")
-    public ResponseEntity<?> reserve(
+    public ResponseEntity<ReservationRes> reserve(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @Valid @RequestBody ReservationReq req,
-            Errors errors
+            @Valid @RequestBody ReservationReq req
     ) {
-        if (errors.hasErrors()) {
-            return ResponseEntity.badRequest().body(errors);
-        }
         return ResponseEntity.ok(reservationService.reserve(userDetails, req));
     }
 }
