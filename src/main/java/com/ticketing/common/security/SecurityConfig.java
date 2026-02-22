@@ -1,6 +1,7 @@
 package com.ticketing.common.security;
 
 import com.ticketing.repository.UserRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,16 +32,28 @@ public class SecurityConfig {
                         .requestMatchers(PERMIT_URL_ARRAY).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/stores/**").permitAll()
                         .anyRequest().authenticated()
-                ).formLogin(Customizer.withDefaults()
-                ).logout(logout -> logout
+                )
+                .formLogin(Customizer.withDefaults())
+                .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout=true")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                         .permitAll()
                 )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            // REST API 경로는 401 Unauthorized 반환 (리다이렉트 없음)
+                            if (request.getRequestURI().startsWith("/api/")) {
+                                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "인증이 필요합니다.");
+                            } else {
+                                // 일반 페이지는 로그인 페이지로 리다이렉트
+                                response.sendRedirect("/login");
+                            }
+                        })
+                )
                 .csrf(csrf -> csrf
-                                .ignoringRequestMatchers("/api/**", "/login")
+                        .ignoringRequestMatchers("/api/**", "/login")
                 );
 
         return http.build();
