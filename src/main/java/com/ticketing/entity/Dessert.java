@@ -1,6 +1,8 @@
 package com.ticketing.entity;
 
 import com.ticketing.enums.OpenStatus;
+import com.ticketing.exception.BusinessException;
+import com.ticketing.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,11 +40,11 @@ public class Dessert{
 
 
     /**
-     * 예약 시 재고 차감. 재고 부족 시 IllegalArgumentException 발생.
+     * 예약 시 재고 차감. 재고 부족 시 BusinessException 발생.
      */
     public void decreaseInventory(int count) {
         if (this.inventory < count) {
-            throw new IllegalArgumentException("재고가 부족합니다. 현재 재고: " + this.inventory + "개");
+            throw new BusinessException(ErrorCode.INSUFFICIENT_INVENTORY);
         }
         this.inventory -= count;
     }
