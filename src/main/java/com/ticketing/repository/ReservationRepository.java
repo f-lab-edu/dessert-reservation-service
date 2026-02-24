@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 
-public interface ReservationRepository extends JpaRepository<Reservation, Long> {
+public interface ReservationRepository extends JpaRepository<Reservation, Long>, CustomReservationRepository {
 
     /**
      * 특정 사용자의 특정 디저트에 대해 당일 취소되지 않은 예약 수량 합산.

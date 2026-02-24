@@ -44,7 +44,6 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             Subscription subscription = Subscription.builder()
                     .userId(userId)
                     .storeId(storeId)
-                    .createdDt(LocalDateTime.now())
                     .build();
             subscriptionRepository.save(subscription);
         }
