@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface SubscriptionRepository extends JpaRepository<Subscription, SubscriptionPk> {
+public interface SubscriptionRepository extends JpaRepository<Subscription, SubscriptionPk>, CustomSubscriptionRepository {
     /**
      * 사용자가 특정 상점을 이미 구독했는지 확인.
      */
