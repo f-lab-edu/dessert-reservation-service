@@ -41,7 +41,7 @@ public class FcmMessageConsumer implements StreamListener<String, MapRecord<Stri
     @Value("${redis.stream.fcm.dlq-key}")
     private String dlqKey;
 
-    private final RedisConstructor redisConstructor;
+    private final RedisOperator redisOperator;
     private final FcmService fcmService;
     private final ObjectMapper objectMapper;
 
@@ -54,10 +54,10 @@ public class FcmMessageConsumer implements StreamListener<String, MapRecord<Stri
     @PostConstruct
     public void start() {
         // Consumer Group 생성 (없으면 생성)
-        redisConstructor.createStreamConsumerGroup(STREAM_KEY, consumerGroup);
+        redisOperator.createStreamConsumerGroup(STREAM_KEY, consumerGroup);
 
         // Listener Container 생성 및 시작
-        listenerContainer = redisConstructor.createStreamMessageListenerContainer();
+        listenerContainer = redisOperator.createStreamMessageListenerContainer();
         listenerContainer.start();
 
         // Consumer 등록 (새로운 메시지만 읽음)
@@ -102,14 +102,14 @@ public class FcmMessageConsumer implements StreamListener<String, MapRecord<Stri
             fcmService.sendMessage(fcmMessage);
 
             // 성공 시 ACK 및 실패 횟수 삭제
-            redisConstructor.ackStream(STREAM_KEY, consumerGroup, message);
-            redisConstructor.deleteFailureCount(messageId);
+            redisOperator.ackStream(STREAM_KEY, consumerGroup, message);
+            redisOperator.deleteFailureCount(messageId);
 
             log.info("FCM 메시지 처리 완료: messageId={}, title={}",
                     messageId, fcmMessage.getTitle());
         } catch (Exception e) {
             // 실패 횟수 증가
-            int failureCount = redisConstructor.incrementFailureCount(messageId);
+            int failureCount = redisOperator.incrementFailureCount(messageId);
 
             log.error("FCM 메시지 처리 실패: messageId={}, failureCount={}, error={}",
                     messageId, failureCount, e.getMessage(), e);
@@ -118,7 +118,7 @@ public class FcmMessageConsumer implements StreamListener<String, MapRecord<Stri
             if (failureCount >= maxRetry) {
                 log.warn("최대 재시도 횟수 초과 - DLQ로 이동: messageId={}, failureCount={}",
                         messageId, failureCount);
-                redisConstructor.moveToDeadLetterQueue(STREAM_KEY, consumerGroup, message, dlqKey);
+                redisOperator.moveToDeadLetterQueue(STREAM_KEY, consumerGroup, message, dlqKey);
             }
             // ACK를 하지 않으면 메시지가 Pending 상태로 남아 재처리 대상이 됨
         }
@@ -132,7 +132,7 @@ public class FcmMessageConsumer implements StreamListener<String, MapRecord<Stri
     public void processPendingMessages() {
         try {
             // Pending 메시지 조회
-            PendingMessages pendingMessages = redisConstructor.findStreamPendingMessages(
+            PendingMessages pendingMessages = redisOperator.findStreamPendingMessages(
                     STREAM_KEY, consumerGroup, consumerName);
 
             if (pendingMessages.isEmpty()) {
@@ -150,7 +150,7 @@ public class FcmMessageConsumer implements StreamListener<String, MapRecord<Stri
                     // 1분 이상 pending 상태인 메시지만 재처리
                     if (pendingMessage.getElapsedTimeSinceLastDelivery().toMillis() > 60000) {
                         // 현재 실패 횟수 조회
-                        int failureCount = redisConstructor.getFailureCount(messageId);
+                        int failureCount = redisOperator.getFailureCount(messageId);
 
                         // 최대 재시도 횟수 초과 시 DLQ로 이동
                         if (failureCount >= maxRetry) {
@@ -159,7 +159,7 @@ public class FcmMessageConsumer implements StreamListener<String, MapRecord<Stri
 
                             // Claim 후 DLQ로 이동
                             List<MapRecord<String, Object, Object>> claimedMessages =
-                                    redisConstructor.claimPendingMessages(
+                                    redisOperator.claimPendingMessages(
                                             STREAM_KEY,
                                             consumerGroup,
                                             consumerName,
@@ -168,14 +168,14 @@ public class FcmMessageConsumer implements StreamListener<String, MapRecord<Stri
                                     );
 
                             for (MapRecord<String, Object, Object> claimedMessage : claimedMessages) {
-                                redisConstructor.moveToDeadLetterQueue(STREAM_KEY, consumerGroup, claimedMessage, dlqKey);
+                                redisOperator.moveToDeadLetterQueue(STREAM_KEY, consumerGroup, claimedMessage, dlqKey);
                             }
                             continue;
                         }
 
                         // Pending 메시지를 claim하여 소유권 이전
                         List<MapRecord<String, Object, Object>> claimedMessages =
-                                redisConstructor.claimPendingMessages(
+                                redisOperator.claimPendingMessages(
                                         STREAM_KEY,
                                         consumerGroup,
                                         consumerName,

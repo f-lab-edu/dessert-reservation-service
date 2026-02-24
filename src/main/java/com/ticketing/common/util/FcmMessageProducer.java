@@ -17,7 +17,7 @@ public class FcmMessageProducer {
 
     public static final String STREAM_KEY = "fcm:notification:stream";
 
-    private final RedisConstructor redisConstructor;
+    private final RedisOperator redisOperator;
 
     /**
      * FCM 메시지를 Redis Stream에 발행.
@@ -30,7 +30,7 @@ public class FcmMessageProducer {
                     .ofObject(messageDto)
                     .withStreamKey(STREAM_KEY);
 
-            redisConstructor.addStreamMessage(record);
+            redisOperator.addStreamMessage(record);
             log.info("FCM 메시지 발행 성공: stream={}, title={}", STREAM_KEY, messageDto.getTitle());
         } catch (Exception e) {
             log.error("FCM 메시지 발행 실패: title={}, error={}", messageDto.getTitle(), e.getMessage(), e);

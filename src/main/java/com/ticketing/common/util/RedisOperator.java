@@ -28,7 +28,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class RedisConstructor {
+public class RedisOperator {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
