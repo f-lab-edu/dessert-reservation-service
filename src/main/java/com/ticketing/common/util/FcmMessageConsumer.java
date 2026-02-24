@@ -1,5 +1,6 @@
 package com.ticketing.common.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ticketing.dto.FcmMessageDto;
 import com.ticketing.service.FcmService;
 import jakarta.annotation.PostConstruct;
@@ -42,6 +43,7 @@ public class FcmMessageConsumer implements StreamListener<String, MapRecord<Stri
 
     private final RedisConstructor redisConstructor;
     private final FcmService fcmService;
+    private final ObjectMapper objectMapper;
 
     private StreamMessageListenerContainer<String, MapRecord<String, Object, Object>> listenerContainer;
     private Subscription subscription;
@@ -93,8 +95,8 @@ public class FcmMessageConsumer implements StreamListener<String, MapRecord<Stri
         String messageId = message.getId().getValue();
 
         try {
-            // 메시지를 FcmMessageDto로 변환
-            FcmMessageDto fcmMessage = FcmMessageDto.from(message);
+            // 메시지를 FcmMessageDto로 변환 (objectMapper 사용하여 타입 안전성 보장)
+            FcmMessageDto fcmMessage = FcmMessageDto.from(message, objectMapper);
 
             // FCM 푸시 알림 전송
             fcmService.sendMessage(fcmMessage);
