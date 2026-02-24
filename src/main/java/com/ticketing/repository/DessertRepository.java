@@ -11,7 +11,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import java.util.List;
 import java.util.Optional;
 
-public interface DessertRepository extends JpaRepository<Dessert, Long> {
+public interface DessertRepository extends JpaRepository<Dessert, Long>, CustomDessertRepository {
     List<Dessert> findAllByStoreId(Long storeId);
 
     /**
