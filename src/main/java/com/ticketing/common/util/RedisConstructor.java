@@ -9,6 +9,7 @@ import io.lettuce.core.protocol.CommandKeyword;
 import io.lettuce.core.protocol.CommandType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.connection.stream.*;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
@@ -31,6 +32,8 @@ public class RedisConstructor {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
+    @Value("${redis.stream.fcm.failures-key}")
+    private String failuresKey;
 
     /**
      * Stream Consumer Group 생성.
@@ -189,8 +192,7 @@ public class RedisConstructor {
      * Redis Hash에 저장된 실패 횟수 반환 (없으면 0).
      */
     public int getFailureCount(String messageId) {
-        String key = "fcm:message:failures";
-        Object count = this.redisTemplate.opsForHash().get(key, messageId);
+        Object count = this.redisTemplate.opsForHash().get(failuresKey, messageId);
         return count != null ? Integer.parseInt(count.toString()) : 0;
     }
 
@@ -199,10 +201,9 @@ public class RedisConstructor {
      * 실패 시마다 호출하여 횟수 추적.
      */
     public int incrementFailureCount(String messageId) {
-        String key = "fcm:message:failures";
-        Long newCount = this.redisTemplate.opsForHash().increment(key, messageId, 1);
+        Long newCount = this.redisTemplate.opsForHash().increment(failuresKey, messageId, 1);
         // TTL 설정 (7일 후 자동 삭제)
-        this.redisTemplate.expire(key, Duration.ofDays(7));
+        this.redisTemplate.expire(failuresKey, Duration.ofDays(7));
         return newCount.intValue();
     }
 
@@ -211,8 +212,7 @@ public class RedisConstructor {
      * 성공적으로 처리된 메시지의 실패 횟수 제거.
      */
     public void deleteFailureCount(String messageId) {
-        String key = "fcm:message:failures";
-        this.redisTemplate.opsForHash().delete(key, messageId);
+        this.redisTemplate.opsForHash().delete(failuresKey, messageId);
     }
 
     /**
