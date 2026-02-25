@@ -1,10 +1,8 @@
 package com.ticketing.scheduler;
 
-import com.ticketing.common.util.FcmMessageProducer;
-import com.ticketing.dto.FcmMessageDto;
-import com.ticketing.dto.StoreSubscriberDto;
+import com.ticketing.common.util.StoreSubscriberNotifier;
+import com.ticketing.enums.NotificationKey;
 import com.ticketing.repository.DessertRepository;
-import com.ticketing.repository.SubscriptionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -13,8 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
 
 /**
  * 디저트 오픈 상태를 자동으로 업데이트하는 스케줄러.
@@ -32,8 +29,7 @@ import java.util.stream.Collectors;
 public class DessertOpenScheduler {
 
     private final DessertRepository dessertRepository;
-    private final SubscriptionRepository subscriptionRepository;
-    private final FcmMessageProducer fcmMessageProducer;
+    private final StoreSubscriberNotifier storeSubscriberNotifier;
 
     /**
      * 15분마다 실행되어 디저트 상태를 PENDING에서 OPEN으로 변경.
@@ -73,49 +69,12 @@ public class DessertOpenScheduler {
 
         log.info("15분 후 오픈 예정 매장 수: {}", storeIds.size());
 
-        List<StoreSubscriberDto> subscribers = subscriptionRepository.findSubscribersByStoreIds(storeIds);
+        // StoreSubscriberNotifier를 사용하여 알림 발송
+        int successCount = storeSubscriberNotifier.notifySubscribers(
+                storeIds,
+                NotificationKey.OPEN_NOTI
+        );
 
-        if (subscribers.isEmpty()) {
-            log.info("구독자 없음");
-            return;
-        }
-
-        log.info("총 구독자 수: {}", subscribers.size());
-
-        // storeId별로 그룹핑
-        Map<Long, List<StoreSubscriberDto>> subscribersByStore = subscribers.stream()
-                .collect(Collectors.groupingBy(StoreSubscriberDto::getStoreId));
-
-        int totalMessageCount = 0;
-
-        // 각 store의 구독자에게 알림 발송
-        for (Long storeId : storeIds) {
-            List<StoreSubscriberDto> storeSubscribers = subscribersByStore.getOrDefault(storeId, Collections.emptyList());
-
-            if (storeSubscribers.isEmpty()) {
-                log.debug("storeId={}의 구독자 없음", storeId);
-                continue;
-            }
-
-            log.info("storeId={}의 구독자 수: {}", storeId, storeSubscribers.size());
-
-            // 각 구독자에게 FCM 메시지 발송
-            for (StoreSubscriberDto subscriber : storeSubscribers) {
-                try {
-                    FcmMessageDto message = FcmMessageDto.builder()
-                            .targetToken(subscriber.getPushToken())
-                            .title("디저트 오픈 알림")
-                            .body("구독하신 매장의 디저트가 15분 후 오픈됩니다!")
-                            .build();
-
-                    fcmMessageProducer.sendMessage(message);
-                    totalMessageCount++;
-                } catch (Exception e) {
-                    log.error("메시지 발송 실패. storeId={}, userId={}", storeId, subscriber.getUserId(), e);
-                }
-            }
-        }
-
-        log.info("디저트 오픈 알림 메시지 생성 완료. 발송된 메시지 수: {}", totalMessageCount);
+        log.info("디저트 오픈 알림 메시지 생성 완료. 발송된 메시지 수: {}", successCount);
     }
 }
