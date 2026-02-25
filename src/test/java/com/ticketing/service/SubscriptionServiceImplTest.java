@@ -1,8 +1,9 @@
-package com.ticketing.service.impl;
+package com.ticketing.service;
 
 import com.ticketing.entity.Subscription;
 import com.ticketing.repository.StoreRepository;
 import com.ticketing.repository.SubscriptionRepository;
+import com.ticketing.service.impl.SubscriptionServiceImpl;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
