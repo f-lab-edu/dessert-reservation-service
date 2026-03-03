@@ -43,3 +43,6 @@ application-local.properties
 
 ### FCM
 src/main/resources/firebase/service-account.json
+
+### Performance Test Config
+performance-tests/scenarios/*-config.json
