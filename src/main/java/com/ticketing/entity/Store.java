@@ -1,9 +1,6 @@
 package com.ticketing.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity(name = "stores")
@@ -14,7 +11,7 @@ import lombok.*;
 public class Store {
     @Id
     @Column(name = "store_id")
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private Double latitude;

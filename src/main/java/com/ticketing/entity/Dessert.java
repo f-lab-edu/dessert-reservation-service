@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 public class Dessert{
     @Id
     @Column(name = "dessert_id")
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id")

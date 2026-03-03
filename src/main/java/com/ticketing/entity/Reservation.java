@@ -18,7 +18,7 @@ import java.math.BigDecimal;
 public class Reservation extends BaseEntity {
     @Id
     @Column(name = "reservation_id")
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
