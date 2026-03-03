@@ -1,0 +1,24 @@
+
+╔═══════════════════════════════════════════════════════════════╗
+║   Concurrency Accuracy Verification Results                  ║
+╚═══════════════════════════════════════════════════════════════╝
+
+Total Attempts:           10
+Successful Reservations:  0 (Expected: 5)
+Failed Reservations:      10 (Expected: 495)
+
+Failure Breakdown:
+  - HTTP 409 (Conflict):   0
+  - HTTP 400 (Bad Req):    0
+  - Other Errors:          10
+
+─────────────────────────────────────────────────────────────
+Overselling Detected:     NO (PASS)
+Accuracy Test Result:     FAIL
+─────────────────────────────────────────────────────────────
+
+⚠️  WARNING: Test did not produce expected results.
+     Expected: 5 successes, 495 failures
+     Actual: 0 successes, 10 failures
+
+═══════════════════════════════════════════════════════════════

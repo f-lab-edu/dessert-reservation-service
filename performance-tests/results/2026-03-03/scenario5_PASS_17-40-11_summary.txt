@@ -1,0 +1,23 @@
+
+╔═══════════════════════════════════════════════════════════════╗
+║   Concurrency Accuracy Verification Results                  ║
+╚═══════════════════════════════════════════════════════════════╝
+
+Total Attempts:           500
+Successful Reservations:  5 (Expected: 5)
+Failed Reservations:      495 (Expected: 495)
+
+Failure Breakdown:
+  - HTTP 409 (Conflict):   0
+  - HTTP 400 (Bad Req):    495
+  - Other Errors:          0
+
+─────────────────────────────────────────────────────────────
+Overselling Detected:     NO (PASS)
+Accuracy Test Result:     PASS
+─────────────────────────────────────────────────────────────
+
+✓ SUCCESS: Pessimistic locking working correctly!
+     Exactly 5 reservations succeeded, no overselling occurred.
+
+═══════════════════════════════════════════════════════════════
